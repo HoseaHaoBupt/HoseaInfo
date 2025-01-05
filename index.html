@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <link rel="stylesheet" href="twicon/twicon.css" />
+  <meta charset="UTF-8" />
+  <title>Hosea Info</title>
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /***background-color: #fcf9f9;**/
+      background-color: #fdfbf5;
+      overflow: hidden;
+    }
+
+    #map-container {
+      position: relative;
+      width: 68%;
+      height: 80vh;
+      background-color:rgba(255, 255, 255, 0.75);
+      border-radius: 25px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .random-icon {
+      position: absolute;
+      opacity: 0;
+      transform: scale(0);
+      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(0.5);
+      }
+      50% {
+        transform: scale(1.5);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .animate {
+      animation: pop 0.3s cubic-bezier(0.25, 1.5, 0.5, 1) forwards;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="map-container"></div>
+
+  <script>
+    const icons = [
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-main-island",
+    "twicon-grave-sense",
+    "twicon-cks-hall",
+    "twicon-gate-cks",
+    "twicon-president-office",
+    "twicon-taipei101",
+    "twicon-taipei101",
+    "twicon-taipei101",
+    "twicon-taipei101",
+    "twicon-np-mus",
+    "twicon-sys-hall",
+    "twicon-nt-mus",
+    "twicon-228-park",
+    "twicon-san-domingo",
+    "twicon-raohe-nm",
+    "twicon-red-house",
+    "twicon-beimen",
+    "twicon-xiaonanmen",
+    "twicon-taipei-stn",
+    "twicon-zeelandia",
+    "twicon-eg-castle",
+    "twicon-hy-statue",
+    "twicon-85tower",
+    "twicon-fb-stn",
+    "twicon-rosary-church",
+    "twicon-longteng-brg",
+    "twicon-ly-museum",
+    "twicon-lovers-brg",
+    "twicon-tunghai-uni",
+    "twicon-taichung-park",
+    "twicon-queens-head",
+    "twicon-ntc-theater",
+    "twicon-vase-rock",
+    "twicon-tropic-cancer",
+    "twicon-fuguijiao-lh",
+    "twicon-yuweng-lh",
+    "twicon-eluanbi-lh",
+    "twicon-kano-staue",
+    "twicon-ershawan",
+    "twicon-bridge",
+    "twicon-balloon",
+    "twicon-taiwan-rw",
+    "twicon-taipei-mrt",
+    "twicon-alishan-rw",
+    "twicon-high-speed-rail",
+    "twicon-gondola",
+    "twicon-youbike",
+    "twicon-yami-boat",
+    "twicon-dragon-boat",
+    "twicon-lantern1",
+    "twicon-lantern2",
+    "twicon-sky-lantern",
+    "twicon-taiwanese-bag",
+    "twicon-postbox1",
+    "twicon-postbox2",
+    "twicon-tapioca",
+    "twicon-beer",
+    "twicon-apple-cider",
+    "twicon-fortune",
+    "twicon-electric-pot",
+    "twicon-flying-fish",
+    "twicon-black-bear",
+    "twicon-trash",
+    "twicon-recycling",
+    "twicon-queue-box",
+    "twicon-bicycle-lane",
+    "twicon-red-man",
+    "twicon-red-man",
+    "twicon-red-man",
+    "twicon-green-man",
+    "twicon-green-man",
+    "twicon-green-man",
+    "twicon-l-nh-insurance",
+    "twicon-l-pixnet",
+    "twicon-l-17live",
+    "twicon-l-wemo",
+    "twicon-l-dcard",
+    "twicon-l-easy-card",
+    "twicon-l-ipass",
+    "twicon-l-youbike",
+    "twicon-l-luxgen",
+    "twicon-l-post",
+    "twicon-l-taiwan-rw",
+    "twicon-l-taipei-mrt",
+    "twicon-l-kaoxiong-mrt"
+    ];
+
+    const colors = ["#b0413b", "#ff565b", "#65b4bd", "#637961", "#ecba69", "#515f87"];
+
+    function getRandomColor() {
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function isOverlapping(newX, newY, newSize, positions) {
+      for (const pos of positions) {
+        const dx = newX - pos.x;
+        const dy = newY - pos.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < (newSize + pos.size) / 2) {
+          return true; // 重叠
+        }
+      }
+      return false; // 不重叠
+    }
+
+    function createIcons() {
+      const body = document.body;
+      const pageWidth = window.innerWidth;
+      const pageHeight = window.innerHeight;
+
+      const targetNumIcons = 101; // 图标数量
+      const baseSize = Math.min(pageWidth, pageHeight) / 15;
+      const positions = [];
+
+      for (let i = 0; i < targetNumIcons; i++) {
+        let x, y, size, attempts = 0;
+
+        do {
+          x = Math.random() * (pageWidth - baseSize);
+          y = Math.random() * (pageHeight - baseSize);
+          size = baseSize * (0.9 + Math.random() * 0.6); // 随机大小范围 0.8x - 1.2x
+          attempts++;
+        } while (isOverlapping(x, y, size, positions) && attempts < 100);
+
+        if (attempts >= 100) {
+          console.warn("无法放置更多图标，停止生成。");
+          break;
+        }
+
+        positions.push({ x, y, size });
+
+        const icon = icons[Math.floor(Math.random() * icons.length)];
+        const iconElement = document.createElement("span");
+        iconElement.className = `twicon ${icon} random-icon`;
+        iconElement.style.left = `${x}px`;
+        iconElement.style.top = `${y}px`;
+        iconElement.style.fontSize = `${size}px`;
+        iconElement.style.color = getRandomColor();
+
+        body.appendChild(iconElement);
+
+        // 动态延迟和动画
+        setTimeout(() => {
+          iconElement.classList.add("animate");
+        }, i * 12); // 缩短延迟，提升出现速度
+      }
+    }
+
+    createIcons();
+  </script>
+</body>
+</html>
