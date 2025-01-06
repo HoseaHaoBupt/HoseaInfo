@@ -156,7 +156,42 @@
       object-fit: cover; /* 图片按比例裁剪 */
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* 添加阴影效果 */
     }
-    
+    @media screen and (max-width: 768px) {
+      #map-container {
+        width: 90%;
+        padding: 1rem;
+      }
+
+      .info-item {
+        font-size: 78px; /* 3x original size */
+        padding: 1.5rem;
+        margin-bottom: 45px; /* 3x original size */
+        border-radius: 36px; /* 3x original size */
+      }
+
+      .info-item i {
+        font-size: 72px; /* 3x original size */
+        margin-right: 45px; /* 3x original size */
+        width: 90px; /* 3x original size */
+      }
+
+      .info-item span {
+        font-size: 54px; /* 3x original size from 18px */
+      }
+
+      .info-right {
+        font-size: 48px; /* Adjusted for better readability */
+      }
+
+      #circle-icon img {
+        width: 300px; /* 3x original size */
+        height: 300px; /* 3x original size */
+      }
+
+      h1 {
+        font-size: 78px; /* 3x original size */
+      }
+    }
   </style>
 </head>
 <body>
