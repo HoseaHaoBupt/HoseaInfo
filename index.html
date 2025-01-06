@@ -82,6 +82,14 @@
       align-items: center;
     }
 
+    .info-item a {
+      color: inherit; /* 使用继承的颜色 */
+      text-decoration: none; /* 去掉下划线 */
+    }
+  
+    .info-item a:hover {
+      text-decoration: underline; /* 悬停时添加下划线（可选） */
+    }
     .info-right {
       color: #666;
       font-size: 0.9em;
@@ -209,39 +217,49 @@
 # 
 # Contact Info
       `;
-
       const markdownContainer = document.getElementById("map-container");
       markdownContainer.innerHTML = marked.parse(markdownContent);
-
+    
       const contactData = [
         { title: "Instagram", icon: "fab fa-instagram", link: "#ToBeUpdated" },
         { title: "Facebook", icon: "fab fa-facebook-f", link: "#ToBeUpdated" },
         { title: "Threads", icon: "fab fa-threads", link: "#ToBeUpdated" },
         { title: "Twitter", icon: "fab fa-twitter", link: "#ToBeUpdated" },
         { title: "Line", icon: "fab fa-line", link: "#ToBeUpdated" },
-        { title: "Wechat", icon: "fab fa-weixin", link: "ID: HoseaHao" },
+        { title: "Wechat", icon: "fab fa-weixin", text: "ID: HoseaHao" },
         { title: "Email", icon: "fas fa-envelope", link: "hoseahao@outlook.com" },
       ];
-
+    
       contactData.forEach((item) => {
-        const link = document.createElement("a");
-        link.href = item.title.toLowerCase() === "email" ? `mailto:${item.link}` : item.link;
-        link.className = "info-item";
-        if (item.title.toLowerCase() !== "wechat") {
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-        }
-        link.innerHTML = `
+        const div = document.createElement("div");
+        div.className = "info-item";
+        const rightContent = item.link 
+          ? `<a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.link}</a>` 
+          : item.text || ""; // 使用 `text` 属性，如果不存在则为空字符串
+    
+        div.innerHTML = `
           <div class="info-left">
             <i class="${item.icon}"></i>
             <span>${item.title}</span>
           </div>
-          <div class="info-right">${item.link}</div>
+          <div class="info-right">${rightContent}</div>
         `;
-        markdownContainer.appendChild(link);
+    
+        // 添加点击复制功能
+        if (item.title.toLowerCase() === "wechat") {
+          div.style.cursor = "pointer";
+          div.addEventListener("click", () => {
+            navigator.clipboard.writeText(item.text).then(() => {
+              alert("微信号已复制到剪贴板!");
+            }).catch(() => {
+              alert("复制失败，请手动复制!");
+            });
+          });
+        }
+    
+        markdownContainer.appendChild(div);
       });
     });
-
     const icons = [
     "twicon-main-island",
     "twicon-main-island",
