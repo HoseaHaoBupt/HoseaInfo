@@ -2,6 +2,9 @@
 <html lang="zh">
 <head>
   <link rel="stylesheet" href="twicon/twicon.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <meta charset="UTF-8" />
   <title>Hosea Info</title>
   <style>
@@ -14,7 +17,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      /***background-color: #fcf9f9;**/
+      font-family: Helvetica, Arial, sans-serif;
       background-color: #fdfbf5;
       overflow: hidden;
     }
@@ -23,13 +26,15 @@
       position: relative;
       width: 68%;
       height: 80vh;
-      background-color:rgba(255, 255, 255, 0.75);
+      background-color: rgba(255, 255, 255, 0.75);
       border-radius: 25px;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
       display: flex;
-      justify-content: center;
-      align-items: center;
+      flex-direction: column;
+      padding: 2rem;
+      overflow-y: auto;
       z-index: 2;
     }
 
@@ -40,28 +45,163 @@
       transition: opacity 0.3s ease-out, transform 0.3s ease-out;
     }
 
+    h1, h2, h3 {
+      text-align: center;
+      font-weight: 600;
+      color: #444;
+      margin: 1rem 0;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        font-size: 18px;
+        padding: 0.5rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        justify-content: space-between;
+        width: 100%;
+        box-sizing: border-box;
+        background-color: rgba(151, 142, 142, 0.1);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid rgba(151, 142, 142, 0.3); /* 添加了边框 */
+      }
+      
+
+    .info-item:hover {
+      background-color: rgb(255, 255, 255);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .info-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .info-right {
+      color: #666;
+      font-size: 0.9em;
+      max-width: 50%;
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .info-item i {
+      font-size: 24px;
+      margin-right: 15px;
+      width: 30px;
+      text-align: center;
+      transition: transform 0.1s ease;
+    }
+
+    .info-item:hover i {
+      transform: scale(1.2);
+    }
+
+    .info-item i.fa-instagram { color: #E4405F; }
+    .info-item i.fa-facebook-f { color: #1877F2; }
+    .info-item i.fa-threads { color: #000000; }
+    .info-item i.fa-twitter { color: #1DA1F2; }
+    .info-item i.fa-line { color: #00B900; }
+    .info-item i.fa-weixin { color: #07C160; }
+    .info-item i.fa-envelope { color: #EA4335; }
+
+    .info-item span {
+      font-size: 18px;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      color: #333;
+    }
+
+    #map-container::-webkit-scrollbar {
+      width: 10px;
+    }
+    #map-container::-webkit-scrollbar-thumb {
+      background: #515f87;
+      border-radius: 5px;
+    }
+    #map-container::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
     @keyframes pop {
-      0% {
-        transform: scale(0.5);
-      }
-      50% {
-        transform: scale(1.5);
-      }
-      100% {
-        transform: scale(1);
-      }
+      0% { transform: scale(0.5); }
+      50% { transform: scale(1.5); }
+      100% { transform: scale(1); }
     }
 
     .animate {
       animation: pop 0.3s cubic-bezier(0.25, 1.5, 0.5, 1) forwards;
       opacity: 1;
     }
+    #circle-icon {
+      position: absolute;
+      top: 50px; /* 控制图标距离map-container顶部的距离 */
+      display: flex;
+      z-index: 3;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #circle-icon img {
+      width: 100px; /* 图标宽度 */
+      height: 100px; /* 图标高度 */
+      border-radius: 50%; /* 圆形边框 */
+      border: 2px solid rgba(151, 142, 142, 0.3); /* 边框样式 */
+      object-fit: cover; /* 图片按比例裁剪 */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* 添加阴影效果 */
+    }
+    
   </style>
 </head>
 <body>
+  
   <div id="map-container"></div>
 
   <script>
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const markdownContent = `
+# Contact Info
+      `;
+
+      const markdownContainer = document.getElementById("map-container");
+      markdownContainer.innerHTML = marked.parse(markdownContent);
+
+      const contactData = [
+        { title: "Instagram", icon: "fab fa-instagram", link: "https://instagram.com/yourusername" },
+        { title: "Facebook", icon: "fab fa-facebook-f", link: "https://facebook.com/yourusername" },
+        { title: "Threads", icon: "fab fa-threads", link: "https://threads.net/@yourusername" },
+        { title: "Twitter", icon: "fab fa-twitter", link: "https://twitter.com/yourusername" },
+        { title: "Line", icon: "fab fa-line", link: "https://line.me/ti/p/~yourusername" },
+        { title: "Wechat", icon: "fab fa-weixin", link: "weixin://dl/chat?HoseaHao" },
+        { title: "Email", icon: "fas fa-envelope", link: "hoseahao@outlook.com" },
+      ];
+
+      contactData.forEach((item) => {
+        const link = document.createElement("a");
+        link.href = item.title.toLowerCase() === "email" ? `mailto:${item.link}` : item.link;
+        link.className = "info-item";
+        if (item.title.toLowerCase() !== "wechat") {
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+        }
+        link.innerHTML = `
+          <div class="info-left">
+            <i class="${item.icon}"></i>
+            <span>${item.title}</span>
+          </div>
+          <div class="info-right">${item.link}</div>
+        `;
+        markdownContainer.appendChild(link);
+      });
+    });
+
     const icons = [
     "twicon-main-island",
     "twicon-main-island",
@@ -168,6 +308,7 @@
     "twicon-l-kaoxiong-mrt"
     ];
 
+    // 其餘背景圖標相關代碼保持不變
     const colors = ["#b0413b", "#ff565b", "#65b4bd", "#637961", "#ecba69", "#515f87"];
 
     function getRandomColor() {
@@ -180,18 +321,17 @@
         const dy = newY - pos.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance < (newSize + pos.size) / 2) {
-          return true; // 重叠
+          return true;
         }
       }
-      return false; // 不重叠
+      return false;
     }
 
     function createIcons() {
       const body = document.body;
       const pageWidth = window.innerWidth;
       const pageHeight = window.innerHeight;
-
-      const targetNumIcons = 101; // 图标数量
+      const targetNumIcons = 101;
       const baseSize = Math.min(pageWidth, pageHeight) / 15;
       const positions = [];
 
@@ -201,12 +341,12 @@
         do {
           x = Math.random() * (pageWidth - baseSize);
           y = Math.random() * (pageHeight - baseSize);
-          size = baseSize * (0.9 + Math.random() * 0.6); // 随机大小范围 0.8x - 1.2x
+          size = baseSize * (0.9 + Math.random() * 0.6);
           attempts++;
         } while (isOverlapping(x, y, size, positions) && attempts < 100);
 
         if (attempts >= 100) {
-          console.warn("无法放置更多图标，停止生成。");
+          console.warn("Unable to place more icons, stopping generation.");
           break;
         }
 
@@ -222,14 +362,16 @@
 
         body.appendChild(iconElement);
 
-        // 动态延迟和动画
         setTimeout(() => {
           iconElement.classList.add("animate");
-        }, i * 12); // 缩短延迟，提升出现速度
+        }, i * 12);
       }
     }
 
     createIcons();
   </script>
+  <div id="circle-icon">
+    <img src="/head.jpg" alt="Circle Icon" />
+  </div>
 </body>
 </html>
