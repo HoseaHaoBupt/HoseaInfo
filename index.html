@@ -366,7 +366,10 @@
       }
       return false;
     }
-
+    function clearIcons() {
+      const icons = document.querySelectorAll(".random-icon");
+      icons.forEach(icon => icon.remove());
+    }
     function createIcons() {
       const body = document.body;
       const pageWidth = window.innerWidth;
@@ -409,6 +412,10 @@
     }
 
     createIcons();
+    window.addEventListener("resize", () => {
+      clearIcons(); // 清除已有图标
+      createIcons(); // 重新生成图标
+    });
   </script>
   <div id="circle-icon">
     <img src="/head.jpg" alt="Circle Icon" />
