@@ -221,13 +221,14 @@
       markdownContainer.innerHTML = marked.parse(markdownContent);
     
       const contactData = [
-        { title: "Instagram", icon: "fab fa-instagram", link: "#ToBeUpdated" },
-        { title: "Facebook", icon: "fab fa-facebook-f", link: "#ToBeUpdated" },
-        { title: "Threads", icon: "fab fa-threads", link: "#ToBeUpdated" },
-        { title: "Twitter", icon: "fab fa-twitter", link: "#ToBeUpdated" },
-        { title: "Line", icon: "fab fa-line", link: "#ToBeUpdated" },
+        { title: "Instagram", icon: "fab fa-instagram", link: "https://www.instagram.com/hoseahao?igsh=eW1ubDBlZW1ob3Rq&utm_source=qr" },
+        { title: "Facebook", icon: "fab fa-facebook-f", link: "https://www.facebook.com/share/15XAb3FYZo/?mibextid=wwXIfr" },
+        { title: "Threads", icon: "fab fa-threads", link: "https://www.threads.net/@hoseahao?igshid=NTc4MTIwNjQ2YQ==" },
+        { title: "Twitter", icon: "fab fa-twitter", link: "https://x.com/hosea_hao?s=21" },
+        { title: "Line", icon: "fab fa-line", link: "https://line.me/ti/p/_6avgX2JdP" },
         { title: "Wechat", icon: "fab fa-weixin", text: "ID: HoseaHao" },
         { title: "Email", icon: "fas fa-envelope", link: "hoseahao@outlook.com" },
+        { title: "Discord", icon: "fas fa-discord", link: "meiou_setsuna" }
       ];
     
       contactData.forEach((item) => {
@@ -256,7 +257,16 @@
             });
           });
         }
-    
+        if (item.title.toLowerCase() === "discord") {
+          div.style.cursor = "pointer";
+          div.addEventListener("click", () => {
+            navigator.clipboard.writeText(item.text).then(() => {
+              alert("DiscordID已复制到剪贴板!");
+            }).catch(() => {
+              alert("复制失败，请手动复制!");
+            });
+          });
+        }
         markdownContainer.appendChild(div);
       });
     });
