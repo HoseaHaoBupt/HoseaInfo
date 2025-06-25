@@ -8,73 +8,198 @@
   <meta charset="UTF-8" />
   <title>Hosea Info</title>
   <style>
-    body,
-    html {
+    :root {
+      --lg-bg-color: rgba(255, 255, 255, 0.25);
+      --lg-highlight: rgba(255, 255, 255, 0.75);
+      --lg-text: #ffffff;
+      --lg-red: #fb4268;
+      --lg-grey: #444739;
+    }
+
+    body {
       margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
+      padding: 0; /* 移除 padding，防止空白 */
+      height: 100vh; /* 确保占满视口高度 */
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: sans-serif;
+      background-image: url("/bg.png");
+      background-size: cover; /* 全屏覆盖 */
+      background-position: 0 center;
+      background-repeat: repeat-x; /* 水平重复 */
+      animation: bg-scroll 25s linear infinite; /* 水平循环滚动 */
+    }
+
+    @keyframes bg-scroll {
+      0% { background-position-x: 0%; }
+      100% { background-position-x: -3840px; } /* 动态滚动，假设图片宽度为屏幕两倍 */
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      flex-wrap: wrap;
       justify-content: center;
       align-items: center;
-      font-family: Helvetica, Arial, sans-serif;
-      background-color: #fdfbf5;
-      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      padding: 2rem 0; /* 将 padding 移到 container */
     }
 
     #map-container {
       position: relative;
-      width: 68%;
+      width: 0; /* 初始宽度为 0 */
       height: 80vh;
-      background-color: rgba(255, 255, 255, 0.75);
-      border-radius: 25px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+      background: transparent;
+      border-radius: 3rem;
+      overflow: hidden;
+      flex: 1 1 auto;
+      box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
+      color: var(--lg-text);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
       display: flex;
       flex-direction: column;
-      padding: 2rem;
-      overflow-y: auto;
-      z-index: 2;
+      animation: expand 0.8s ease-out forwards; /* 展开动画 */
     }
 
-    .random-icon {
+    @keyframes expand {
+      0% { width: 0; }
+      100% { width: 68%; } /* 目标宽度 */
+    }
+
+    @media screen and (max-aspect-ratio: 4/3) {
+      #map-container {
+        width: 0; /* 初始宽度为 0 */
+        padding: 1rem;
+        height: 70vh;
+        animation: expand-mobile 0.8s ease-out forwards; /* 移动端动画 */
+      }
+
+      @keyframes expand-mobile {
+        0% { width: 0; }
+        100% { width: 90%; } /* 移动端目标宽度 */
+      }
+    }
+
+    .glass-filter,
+    .glass-overlay,
+    .glass-specular {
       position: absolute;
-      opacity: 0;
-      transform: scale(0);
-      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+      inset: 0;
+      border-radius: inherit;
+    }
+
+    .glass-filter {
+      z-index: 0;
+      backdrop-filter: blur(4px);
+      filter: url(#lensFilter) saturate(120%) brightness(1.15);
+    }
+
+    .glass-overlay {
+      z-index: 1;
+      background: var(--lg-bg-color);
+    }
+
+    .glass-specular {
+      z-index: 2;
+      box-shadow: inset 1px 1px 0 var(--lg-highlight), inset 0 0 5px var(--lg-highlight);
+    }
+
+    .glass-content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      padding: 12px 28px;
+      gap: 1rem;
+      overflow-y: auto;
+    }
+
+    .fixed-header {
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      background: transparent;
+      padding: 1rem 0;
     }
 
     h1, h2, h3 {
       text-align: center;
       font-weight: 600;
-      color: #444;
+      color: #333;
       margin: 1rem 0;
     }
 
     .info-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-        font-size: 26px;
-        padding: 0.5rem;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        justify-content: space-between;
-        width: 100%;
-        box-sizing: border-box;
-        background-color: rgba(151, 142, 142, 0.1);
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(10px);
-        border-radius: 12px;
-        border: 1px solid rgba(151, 142, 142, 0.3); /* 添加了边框 */
-      }
-      
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 26px;
+      padding: 0.5rem 2.5rem;
+      width: 100%;
+      box-sizing: border-box;
+      background: transparent;
+      border-radius: 3rem;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      color: #333;
+      transition: all 0.2s ease;
+      min-height: 80px;
+      flex: 1 1 auto;
+      cursor: pointer;
+    }
 
     .info-item:hover {
-      background-color: rgb(255, 255, 255);
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--lg-red);
+    }
+
+    .info-item:hover i,
+    .info-item:hover span,
+    .info-item:hover a {
+      color: var(--lg-red);
+    }
+
+    .info-item--active {
+      background: rgba(0, 0, 0, 0.30);
+      color: var(--lg-red);
+    }
+
+    .info-item--active i,
+    .info-item--active span,
+    .info-item--active a {
+      color: var(--lg-red);
+    }
+
+    .info-item .glass-filter {
+      z-index: 0;
+      backdrop-filter: blur(5px);
+    }
+
+    .info-item .glass-overlay {
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .info-item .glass-specular {
+      z-index: 2;
+    }
+
+    .info-item-content {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
     }
 
     .info-left {
@@ -83,13 +208,14 @@
     }
 
     .info-item a {
-      color: inherit; /* 使用继承的颜色 */
-      text-decoration: none; /* 去掉下划线 */
+      color: inherit;
+      text-decoration: none;
     }
-  
+
     .info-item a:hover {
-      text-decoration: underline; /* 悬停时添加下划线（可选） */
+      text-decoration: underline;
     }
+
     .info-right {
       color: #666;
       font-size: 0.9em;
@@ -126,17 +252,30 @@
       color: #333;
     }
 
-    #map-container::-webkit-scrollbar {
-      width: 10px;
-    }
-    #map-container::-webkit-scrollbar-thumb {
-      background: #515f87;
-      border-radius: 5px;
-    }
-    #map-container::-webkit-scrollbar-track {
-      background: transparent;
+    /* 确保 #map-container 和其子元素无滚动条 */
+    #map-container {
+      overflow-y: auto; /* 保持滚动功能 */
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE 和 Edge */
     }
 
+    #map-container::-webkit-scrollbar {
+      width: 0; /* Chrome, Safari, Edge */
+      height: 0;
+      display: none;
+    }
+
+    /* 针对子元素 .glass-content 的滚动条 */
+    .glass-content {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE 和 Edge */
+    }
+
+    .glass-content::-webkit-scrollbar {
+      width: 0; /* Chrome, Safari, Edge */
+      height: 0;
+      display: none;
+    }
     @keyframes pop {
       0% { transform: scale(0.5); }
       50% { transform: scale(1.5); }
@@ -144,309 +283,142 @@
     }
 
     .animate {
-      animation: pop 0.3s cubic-bezier(0.25, 1.5, 0.5, 1) forwards;
+      animation: pop 0.3s cubic-bezier(1, 0.5, 0.5, 1) forwards;
       opacity: 1;
     }
+
     #circle-icon {
       position: absolute;
-      top: 50px; /* 控制图标距离map-container顶部的距离 */
+      top: 50px;
       display: flex;
-      z-index: 3;
+      z-index: 5;
       justify-content: center;
       align-items: center;
     }
 
-    #circle-icon img {
-      width: 100px; /* 图标宽度 */
-      height: 100px; /* 图标高度 */
-      border-radius: 50%; /* 圆形边框 */
-      border: 8px solid rgba(206, 199, 199, 0.8); /* 边框样式 */
-      object-fit: cover; /* 图片按比例裁剪 */
-      box-shadow: 0 8px 10px rgba(0, 0, 0, 0.6); /* 添加阴影效果 */
-    }
-      /* 针对宽高比的媒体查询 */
-  @media screen and (max-aspect-ratio: 4/3) {
-    #map-container {
-      width: 90%;
-      padding: 1rem;
-      height: 70vh; /* 根据需求调整高度 */
-    }
+    @media screen and (max-aspect-ratio: 4/3) {
+      #map-container {
+        width: 90%;
+        padding: 1rem;
+        height: 70vh;
+      }
 
-    .info-item {
-      font-size: 52px; /* 2x 默认值 */
-      padding: 1rem;
-      margin-bottom: 30px; /* 2x 默认值 */
-      border-radius: 24px; /* 2x 默认值 */
-    }
+      .info-item {
+        font-size: 52px;
+        padding: 0.5rem 2.5rem;
+        margin-bottom: 30px;
+        border-radius: 3rem;
+        min-height: 160px;
+      }
 
-    .info-item i {
-      font-size: 48px; /* 2x 默认值 */
-      margin-right: 30px; /* 2x 默认值 */
-      width: 60px; /* 2x 默认值 */
-    }
+      .info-item i {
+        font-size: 48px;
+        margin-right: 30px;
+        width: 60px;
+      }
 
-    .info-item span {
-      font-size: 36px; /* 2x 默认值 */
-    }
+      .info-item span {
+        font-size: 36px;
+      }
 
-    .info-right {
-      font-size: 32px; /* 调整为更大的可读字体 */
-    }
+      .info-right {
+        font-size: 32px;
+      }
 
-    #circle-icon img {
-      width: 200px; /* 2x 默认值 */
-      height: 200px; /* 2x 默认值 */
-    }
+      #circle-icon img {
+        width: 200px;
+        height: 200px;
+      }
 
-    h1 {
-      font-size: 52px; /* 2x 默认值 */
+      h1 {
+        font-size: 52px;
+      }
     }
-  }
   </style>
 </head>
 <body>
-  
-  <div id="map-container"></div>
+  <div class="container">
+    <div id="map-container">
+      <div class="glass-filter"></div>
+      <div class="glass-overlay"></div>
+      <div class="glass-specular"></div>
+      <div class="fixed-header">
+        <h1>Contact Info</h1>
+      </div>
+      <div class="glass-content"></div>
+    </div>
+  </div>
 
   <script>
-    
     document.addEventListener('DOMContentLoaded', function() {
-      const markdownContent = `
+      const markdownContainer = document.querySelector("#map-container .glass-content");
 
-#        
-# 
-# Contact Info
-      `;
-      const markdownContainer = document.getElementById("map-container");
-      markdownContainer.innerHTML = marked.parse(markdownContent);
-    
       const contactData = [
-        { title: "Instagram", icon: "fab fa-instagram", link: "https://www.instagram.com/hoseahao/?igsh=eW1ubDBlZW1ob3Rq&utm_source=qr" },
+        { title: "Instagram", icon: "fab fa-instagram", link: "https://www.instagram.com/hoseah_memoires/?igsh=eW1ubDBlZW1ob3Rq&utm_source=qr" },
         { title: "Facebook", icon: "fab fa-facebook-f", link: "https://www.facebook.com/share/15XAb3FYZo/?mibextid=wwXIfr" },
-        { title: "Threads", icon: "fab fa-threads", link: "https://www.threads.net/@hoseahao?igshid=NTc4MTIwNjQ2YQ==" },
+        { title: "Threads", icon: "fab fa-threads", link: "https://www.threads.net/@hoseahao?igshid=NTExMTIwNjQ2YQ==" },
         { title: "Twitter", icon: "fab fa-twitter", link: "https://x.com/hosea_hao?s=21" },
         { title: "Line", icon: "fab fa-line", link: "https://line.me/ti/p/_6avgX2JdP" },
-       // { title: "Wechat", icon: "fab fa-weixin", text: "ID: HoseaHao" },
-        { title: "Email", icon: "fas fa-envelope", link: "hoseahao@outlook.com" },
+        { title: "Email", icon: "fas fa-envelope", text: "hoseahao@outlook.com" },
         { title: "Discord", icon: "fa-brands fa-discord", text: "ID: hoseahao" }
       ];
-    
+
       contactData.forEach((item) => {
         const div = document.createElement("div");
         div.className = "info-item";
         const rightContent = item.link 
           ? `<a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.link}</a>` 
-          : item.text || ""; // 使用 `text` 属性，如果不存在则为空字符串
-    
+          : item.text || "";
+
         div.innerHTML = `
-          <div class="info-left">
-            <i class="${item.icon}"></i>
-            <span>${item.title}</span>
+          <div class="glass-filter"></div>
+          <div class="glass-overlay"></div>
+          <div class="glass-specular"></div>
+          <div class="info-item-content">
+            <div class="info-left">
+              <i class="${item.icon}"></i>
+              <span>${item.title}</span>
+            </div>
+            <div class="info-right">${rightContent}</div>
           </div>
-          <div class="info-right">${rightContent}</div>
         `;
-    
-        // 添加点击复制功能
-        if (item.title.toLowerCase() === "wechat") {
-          div.style.cursor = "pointer";
-          div.addEventListener("click", () => {
-            navigator.clipboard.writeText(item.text).then(() => {
-              alert("微信号已复制到剪贴板!");
-            }).catch(() => {
-              alert("复制失败，请手动复制!");
-            });
-          });
-        }
-        if (item.title.toLowerCase() === "discord") {
-          div.style.cursor = "pointer";
-          div.addEventListener("click", () => {
+
+        div.addEventListener("click", () => {
+          document.querySelectorAll(".info-item").forEach(el => el.classList.remove("info-item--active"));
+          div.classList.add("info-item--active");
+          
+          if (item.link) {
+            setTimeout(() => {
+              window.open(item.link, "_blank");
+            }, 200);
+          } else if (item.title.toLowerCase() === "discord") {
             navigator.clipboard.writeText(item.text).then(() => {
               alert("DiscordID已复制到剪贴板!");
             }).catch(() => {
               alert("复制失败，请手动复制!");
             });
-          });
-        }
+          }else if (item.title.toLowerCase() === "email") {
+            navigator.clipboard.writeText(item.text).then(() => {
+              alert("Email已复制到剪贴板!");
+            }).catch(() => {
+              alert("复制失败，请手动复制!");
+            });
+          }
+        });
+
         markdownContainer.appendChild(div);
       });
     });
-    const icons = [
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-main-island",
-    "twicon-grave-sense",
-    "twicon-cks-hall",
-    "twicon-gate-cks",
-    "twicon-president-office",
-    "twicon-taipei101",
-    "twicon-taipei101",
-    "twicon-taipei101",
-    "twicon-taipei101",
-    "twicon-np-mus",
-    "twicon-sys-hall",
-    "twicon-nt-mus",
-    "twicon-228-park",
-    "twicon-san-domingo",
-    "twicon-raohe-nm",
-    "twicon-red-house",
-    "twicon-beimen",
-    "twicon-xiaonanmen",
-    "twicon-taipei-stn",
-    "twicon-zeelandia",
-    "twicon-eg-castle",
-    "twicon-hy-statue",
-    "twicon-85tower",
-    "twicon-fb-stn",
-    "twicon-rosary-church",
-    "twicon-longteng-brg",
-    "twicon-ly-museum",
-    "twicon-lovers-brg",
-    "twicon-tunghai-uni",
-    "twicon-taichung-park",
-    "twicon-queens-head",
-    "twicon-ntc-theater",
-    "twicon-vase-rock",
-    "twicon-tropic-cancer",
-    "twicon-fuguijiao-lh",
-    "twicon-yuweng-lh",
-    "twicon-eluanbi-lh",
-    "twicon-kano-staue",
-    "twicon-ershawan",
-    "twicon-bridge",
-    "twicon-balloon",
-    "twicon-taiwan-rw",
-    "twicon-taipei-mrt",
-    "twicon-alishan-rw",
-    "twicon-high-speed-rail",
-    "twicon-gondola",
-    "twicon-youbike",
-    "twicon-yami-boat",
-    "twicon-dragon-boat",
-    "twicon-lantern1",
-    "twicon-lantern2",
-    "twicon-sky-lantern",
-    "twicon-taiwanese-bag",
-    "twicon-postbox1",
-    "twicon-postbox2",
-    "twicon-tapioca",
-    "twicon-beer",
-    "twicon-apple-cider",
-    "twicon-fortune",
-    "twicon-electric-pot",
-    "twicon-flying-fish",
-    "twicon-black-bear",
-    "twicon-trash",
-    "twicon-recycling",
-    "twicon-queue-box",
-    "twicon-bicycle-lane",
-    "twicon-red-man",
-    "twicon-red-man",
-    "twicon-red-man",
-    "twicon-green-man",
-    "twicon-green-man",
-    "twicon-green-man",
-    "twicon-l-nh-insurance",
-    "twicon-l-pixnet",
-    "twicon-l-17live",
-    "twicon-l-wemo",
-    "twicon-l-dcard",
-    "twicon-l-easy-card",
-    "twicon-l-ipass",
-    "twicon-l-youbike",
-    "twicon-l-luxgen",
-    "twicon-l-post",
-    "twicon-l-taiwan-rw",
-    "twicon-l-taipei-mrt",
-    "twicon-l-kaoxiong-mrt"
-    ];
 
-    // 其餘背景圖標相關代碼保持不變
-    const colors = ["#b0413b", "#ff565b", "#65b4bd", "#637961", "#ecba69", "#515f87"];
-
-    function getRandomColor() {
-      return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    function isOverlapping(newX, newY, newSize, positions) {
-      for (const pos of positions) {
-        const dx = newX - pos.x;
-        const dy = newY - pos.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < (newSize + pos.size) / 2) {
-          return true;
-        }
-      }
-      return false;
-    }
-    function clearIcons() {
-      const icons = document.querySelectorAll(".random-icon");
-      icons.forEach(icon => icon.remove());
-    }
-    function createIcons() {
-      const body = document.body;
-      const pageWidth = window.innerWidth;
-      const pageHeight = window.innerHeight;
-      const targetNumIcons = 101;
-      const baseSize = Math.min(pageWidth, pageHeight) / 15;
-      const positions = [];
-
-      for (let i = 0; i < targetNumIcons; i++) {
-        let x, y, size, attempts = 0;
-
-        do {
-          x = Math.random() * (pageWidth - baseSize);
-          y = Math.random() * (pageHeight - baseSize);
-          size = baseSize * (0.9 + Math.random() * 0.6);
-          attempts++;
-        } while (isOverlapping(x, y, size, positions) && attempts < 100);
-
-        if (attempts >= 100) {
-          console.warn("Unable to place more icons, stopping generation.");
-          break;
-        }
-
-        positions.push({ x, y, size });
-
-        const icon = icons[Math.floor(Math.random() * icons.length)];
-        const iconElement = document.createElement("span");
-        iconElement.className = `twicon ${icon} random-icon`;
-        iconElement.style.left = `${x}px`;
-        iconElement.style.top = `${y}px`;
-        iconElement.style.fontSize = `${size}px`;
-        iconElement.style.color = getRandomColor();
-
-        body.appendChild(iconElement);
-
-        setTimeout(() => {
-          iconElement.classList.add("animate");
-        }, i * 12);
-      }
-    }
-
-    createIcons();
-    window.addEventListener("resize", () => {
-      clearIcons(); // 清除已有图标
-      createIcons(); // 重新生成图标
-    });
   </script>
-  <div id="circle-icon">
-    <img src="/head.jpg" alt="Circle Icon" />
-  </div>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <filter id="lensFilter" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+      <feComponentTransfer in="SourceAlpha" result="alpha">
+        <feFuncA type="identity" />
+      </feComponentTransfer>
+      <feGaussianBlur in="alpha" stdDeviation="50" result="blur" />
+      <feDisplacementMap in="SourceGraphic" in2="blur" scale="50" xChannelSelector="A" yChannelSelector="A" />
+    </filter>
+  </svg>
 </body>
 </html>
